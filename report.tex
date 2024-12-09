@@ -142,9 +142,6 @@ Homography transformations were applied to simulate perspective distortions by r
 \subsection{Gaussian Noise}
 Gaussian noise was added to the images to simulate noisy conditions, commonly encountered in practical scenarios like low-light environments. Noise levels were defined by the standard deviation (\textit{sigma}) of the Gaussian distribution, with three levels tested: 0.2, 0.5, and 0.7. These levels introduced increasing degrees of image degradation to test the robustness of the models.
 
-\subsection{Transformation Visualization}
-To provide a qualitative insight into the applied transformations, Figure~\ref{fig:experiment_visualization} illustrates the impact of Homography (max\_offset = 2.5) and Gaussian Noise (sigma = 0.7) on sample images from the dataset. These examples represent the most challenging transformations applied in this study.
-
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{images/Experiment.pdf}
@@ -175,9 +172,6 @@ The baseline accuracy represents the performance of each model on the unaltered 
     \end{tabular}
 \end{table}
 
-\textbf{Analysis}:  
-CNN achieved the highest baseline accuracy due to its ability to capture spatial hierarchies in image data, while SVM with a Polynomial Kernel excelled at modeling complex feature interactions. Linear models like FDA, while effective for linearly separable data, showed slightly lower accuracy due to their inability to handle non-linear relationships effectively.
-
 \subsection{Homography Transformation}
 For transformations with \textit{max\_offset} = 1.5, the accuracy of most models remained consistent with baseline results. As such, detailed results for this case are omitted, and the focus is on higher severity levels (\textit{max\_offset} = 2 and 2.5). 
 
@@ -189,7 +183,16 @@ For transformations with \textit{max\_offset} = 1.5, the accuracy of most models
 \end{figure}
 
 \textbf{Analysis}:  
-CNN displayed remarkable resilience to homography transformations, maintaining accuracy above 85\% even at \textit{max\_offset} = 2.5, leveraging its spatial invariance capabilities. SVM with a Gaussian Kernel also exhibited robust performance, benefiting from its non-linear transformation modeling capacity. In contrast, Logistic Regression and MLP saw significant accuracy drops with increasing transformation severity due to their simpler architectures. FDA, reliant on linear assumptions, performed poorly under severe transformations.
+CNN displayed remarkable resilience to homography transformations, maintaining accuracy above 85\% even at \textit{max\_offset} = 2.5, leveraging its translation invariance capabilities. 
+This robustness stems from CNN's ability to learn spatially invariant features through convolutional filters, making it particularly well-suited for handling geometric transformations. 
+In contrast, MLP suffered as it primarily captures global patterns in the trained images, which become harder to discern under severe perspective distortions. 
+SVM with a Gaussian Kernel also exhibited robust performance, benefiting from the kernel trick, which effectively increases the dimensionality of the dataset to enhance linear 
+separability, as demonstrated by Cover's theorem. This capacity to handle non-linear transformations allowed SVM to maintain relatively stable accuracy despite increasing transformation severity. 
+Logistic Regression experienced significant accuracy drops as the severity of the transformation increased, reflecting its limitation as a linear model incapable of modeling 
+complex patterns introduced by homography. Similarly, FDA, which relies on linear assumptions, performed poorly under severe transformations. 
+This method seeks to maximize class separability by projecting data onto a lower-dimensional subspace where class variance is maximized and within-class variance is minimized. 
+However, the severe distortions introduced by homography transformations disrupt the relative positions and structures of the data points. 
+As a result, FDA struggles to create a meaningful projection that preserves class separability, leading to a significant decline in performance.
 
 \subsection{Gaussian Noise Transformation}
 For noise levels with \textit{sigma} = 0.2, most models performed similarly to their baseline accuracy, indicating minimal impact. Results for this case are not presented, and the analysis emphasizes higher severity levels (\textit{sigma} = 0.5 and 0.7).
@@ -202,17 +205,15 @@ For noise levels with \textit{sigma} = 0.2, most models performed similarly to t
 \end{figure}
 
 \textbf{Analysis}:  
-SVM with a Polynomial Kernel demonstrated the highest tolerance to noise, particularly at \textit{sigma} = 0.5, while CNN showed moderate robustness but experienced significant degradation at \textit{sigma} = 0.7. Logistic Regression performed reasonably at low noise levels but deteriorated at higher noise levels, reflecting its sensitivity to input variability. FDA exhibited the sharpest accuracy decline, underscoring its vulnerability to noisy environments due to its reliance on linear discrimination. MLP, while better than FDA and Logistic Regression, struggled with higher noise levels, indicating limitations in its learned representations for handling extreme variability.
-
-\subsection{Summary}
-Overall, CNN emerged as the most robust model under homography transformations due to its ability to extract spatially invariant features. For Gaussian noise, SVM with a Polynomial Kernel showed superior performance, suggesting its robustness in noisy conditions. Linear models like Logistic Regression and FDA, though computationally efficient, were unable to handle significant distortions or noise effectively. While MLP performed better than linear models in non-linear scenarios, its robustness remains inferior to CNN and SVM under challenging conditions.
-
+SVM with a Polynomial Kernel demonstrated the highest tolerance to noise, particularly at \textit{sigma} = 0.5, while CNN showed moderate robustness but experienced significant degradation at \textit{sigma} = 0.7. This decline in CNN performance can be attributed to its reliance on local pattern recognition; as noise increases, the model struggles to identify these local patterns effectively. Similarly, MLP faced challenges due to its difficulty in capturing global patterns under noisy conditions. 
+In contrast, Logistic Regression and SVM exhibited relatively stable performance. Logistic Regression's simplicity and reliance on linear boundaries allowed it to perform adequately at lower noise levels, as it is less influenced by distortions in the input space. SVM's robustness can be explained by its ability to transform data into higher-dimensional spaces using kernel functions, which enhances its capacity to separate classes even in noisy environments.
+FDA, however, exhibited the sharpest accuracy decline, reflecting its vulnerability to noise. FDA aims to maximize the separation between classes by increasing the inter-class variance while minimizing intra-class variance. With added noise, the distinction between classes becomes blurred, making it increasingly difficult for the model to preserve inter-class variance during the dimensionality reduction process. This limitation results in a significant drop in classification accuracy under noisy conditions.
 
 \section{Conclusion}
 
-This study assessed the robustness of six machine learning models—Logistic Regression, FDA, SVM with Gaussian and Polynomial kernels, MLP, and CNN—
-under homography and Gaussian noise transformations. CNN excelled in handling perspective distortions, while SVM with a Polynomial Kernel showed strong tolerance to noise. 
-Linear models like Logistic Regression and FDA, though efficient, struggled with significant distortions, and MLP, while better in non-linear tasks, was less robust than CNN and SVM. 
-These findings highlight the need for careful model selection based on robustness to specific data distortions, with future work extending to more diverse datasets and transformations.
+This study evaluated six machine learning models—Logistic Regression, FDA, SVM (Gaussian and Polynomial kernels), MLP, and CNN—under homography and Gaussian noise transformations. 
+CNN handled perspective distortions best, while SVM with a Polynomial Kernel excelled in noisy conditions. 
+Linear models (Logistic Regression and FDA) and MLP struggled with significant distortions. These results underscore the importance of selecting models based on robustness to specific data distortions, 
+with future studies exploring diverse datasets and transformations.
 \end{document}
 
